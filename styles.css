@@ -1,0 +1,35 @@
+/*
+ * PunctFlow — 设置面板样式
+ */
+
+.punctflow-mapping-list {
+  margin-bottom: 8px;
+}
+
+.punctflow-mapping-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.punctflow-mapping-row .setting-item {
+  flex: 1;
+  padding: 4px 0;
+  border: none;
+}
+
+.punctflow-mapping-row .setting-item-info {
+  display: none;
+}
+
+.punctflow-mapping-row .setting-item-control {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+
+.punctflow-mapping-row .setting-item-control input {
+  flex: 1;
+  min-width: 0;
+}

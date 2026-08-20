@@ -1,0 +1,335 @@
+0 verbose cli D:\B_development\Nodejs_24-18-0\node.exe D:\B_development\Nodejs_24-18-0\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.16.0
+2 info using node@v24.18.0
+3 silly config load:file:D:\B_development\Nodejs_24-18-0\node_modules\npm\npmrc
+4 silly config load:file:D:\Code\Codex\PunctFlow\.npmrc
+5 silly config load:file:C:\Users\zhongruichao\.npmrc
+6 silly config load:file:D:\B_development\Nodejs_24-18-0\node_global\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--no-audit" "--no-fund" "--cache" ".\\.npm-cache"
+9 verbose logfile logs-max:10 dir:D:\Code\Codex\PunctFlow\.npm-cache\_logs\2026-08-20T12_25_43_280Z-
+10 verbose logfile D:\Code\Codex\PunctFlow\.npm-cache\_logs\2026-08-20T12_25_43_280Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest @types/node@^20.11.0
+15 silly packumentCache full:https://registry.npmjs.org/@types%2fnode cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/npm 1804ms
+17 http fetch GET 200 https://registry.npmjs.org/@types%2fnode 2319ms (cache miss)
+18 silly packumentCache full:https://registry.npmjs.org/@types%2fnode set size:undefined disposed:false
+19 silly fetch manifest builtin-modules@^3.3.0
+20 silly packumentCache full:https://registry.npmjs.org/builtin-modules cache-miss
+21 http fetch GET 200 https://registry.npmjs.org/builtin-modules 238ms (cache miss)
+22 silly packumentCache full:https://registry.npmjs.org/builtin-modules set size:undefined disposed:false
+23 silly fetch manifest esbuild@^0.20.0
+24 silly packumentCache full:https://registry.npmjs.org/esbuild cache-miss
+25 http fetch GET 200 https://registry.npmjs.org/esbuild 365ms (cache miss)
+26 silly packumentCache full:https://registry.npmjs.org/esbuild set size:undefined disposed:false
+27 silly fetch manifest obsidian@^1.4.11
+28 silly packumentCache full:https://registry.npmjs.org/obsidian cache-miss
+29 http fetch GET 200 https://registry.npmjs.org/obsidian 253ms (cache miss)
+30 silly packumentCache full:https://registry.npmjs.org/obsidian set size:undefined disposed:false
+31 silly fetch manifest @codemirror/state@6.5.0
+32 silly packumentCache full:https://registry.npmjs.org/@codemirror%2fstate cache-miss
+33 http fetch GET 200 https://registry.npmjs.org/@codemirror%2fstate 250ms (cache miss)
+34 silly packumentCache full:https://registry.npmjs.org/@codemirror%2fstate set size:undefined disposed:false
+35 silly fetch manifest @codemirror/view@6.38.6
+36 silly packumentCache full:https://registry.npmjs.org/@codemirror%2fview cache-miss
+37 http fetch GET 200 https://registry.npmjs.org/@codemirror%2fview 374ms (cache miss)
+38 silly packumentCache full:https://registry.npmjs.org/@codemirror%2fview set size:undefined disposed:false
+39 silly fetch manifest tslib@^2.6.2
+40 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+41 http fetch GET 200 https://registry.npmjs.org/tslib 281ms (cache miss)
+42 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+43 silly fetch manifest typescript@^5.3.3
+44 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+45 http fetch GET 200 https://registry.npmjs.org/typescript 1405ms (cache miss)
+46 silly packumentCache full:https://registry.npmjs.org/typescript set size:undefined disposed:false
+47 silly placeDep ROOT @types/node@20.19.43 OK for: obsidian-punctflow@1.0.0 want: ^20.11.0
+48 silly placeDep ROOT builtin-modules@3.3.0 OK for: obsidian-punctflow@1.0.0 want: ^3.3.0
+49 silly placeDep ROOT esbuild@0.20.2 OK for: obsidian-punctflow@1.0.0 want: ^0.20.0
+50 silly placeDep ROOT obsidian@1.13.1 OK for: obsidian-punctflow@1.0.0 want: ^1.4.11
+51 silly placeDep ROOT @codemirror/state@6.5.0 OK for: obsidian@1.13.1 want: 6.5.0
+52 silly placeDep ROOT @codemirror/view@6.38.6 OK for: obsidian@1.13.1 want: 6.38.6
+53 silly placeDep ROOT tslib@2.8.1 OK for: obsidian-punctflow@1.0.0 want: ^2.6.2
+54 silly placeDep ROOT typescript@5.9.3 OK for: obsidian-punctflow@1.0.0 want: ^5.3.3
+55 silly fetch manifest undici-types@~6.21.0
+56 silly packumentCache full:https://registry.npmjs.org/undici-types cache-miss
+57 silly fetch manifest @esbuild/aix-ppc64@0.20.2
+58 silly packumentCache full:https://registry.npmjs.org/@esbuild%2faix-ppc64 cache-miss
+59 silly fetch manifest @esbuild/linux-arm@0.20.2
+60 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm cache-miss
+61 silly fetch manifest @esbuild/linux-x64@0.20.2
+62 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-x64 cache-miss
+63 silly fetch manifest @esbuild/sunos-x64@0.20.2
+64 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fsunos-x64 cache-miss
+65 silly fetch manifest @esbuild/win32-x64@0.20.2
+66 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-x64 cache-miss
+67 silly fetch manifest @esbuild/darwin-x64@0.20.2
+68 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-x64 cache-miss
+69 silly fetch manifest @esbuild/linux-ia32@0.20.2
+70 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ia32 cache-miss
+71 silly fetch manifest @esbuild/netbsd-x64@0.20.2
+72 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-x64 cache-miss
+73 silly fetch manifest @esbuild/win32-ia32@0.20.2
+74 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-ia32 cache-miss
+75 silly fetch manifest @esbuild/android-arm@0.20.2
+76 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm cache-miss
+77 silly fetch manifest @esbuild/android-x64@0.20.2
+78 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-x64 cache-miss
+79 silly fetch manifest @esbuild/freebsd-x64@0.20.2
+80 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-x64 cache-miss
+81 silly fetch manifest @esbuild/linux-arm64@0.20.2
+82 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm64 cache-miss
+83 silly fetch manifest @esbuild/linux-ppc64@0.20.2
+84 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ppc64 cache-miss
+85 silly fetch manifest @esbuild/linux-s390x@0.20.2
+86 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-s390x cache-miss
+87 silly fetch manifest @esbuild/openbsd-x64@0.20.2
+88 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-x64 cache-miss
+89 silly fetch manifest @esbuild/win32-arm64@0.20.2
+90 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-arm64 cache-miss
+91 silly fetch manifest @esbuild/darwin-arm64@0.20.2
+92 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-arm64 cache-miss
+93 silly fetch manifest @esbuild/android-arm64@0.20.2
+94 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm64 cache-miss
+95 silly fetch manifest @esbuild/freebsd-arm64@0.20.2
+96 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 cache-miss
+97 silly fetch manifest @esbuild/linux-loong64@0.20.2
+98 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-loong64 cache-miss
+99 silly fetch manifest @esbuild/linux-riscv64@0.20.2
+100 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-riscv64 cache-miss
+101 http fetch GET 200 https://registry.npmjs.org/undici-types 249ms (cache miss)
+102 silly packumentCache full:https://registry.npmjs.org/undici-types set size:undefined disposed:false
+103 silly fetch manifest @esbuild/linux-mips64el@0.20.2
+104 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-mips64el cache-miss
+105 http fetch GET 200 https://registry.npmjs.org/@esbuild%2faix-ppc64 308ms (cache miss)
+106 silly packumentCache full:https://registry.npmjs.org/@esbuild%2faix-ppc64 set size:undefined disposed:false
+107 silly fetch manifest @types/codemirror@5.60.8
+108 silly packumentCache full:https://registry.npmjs.org/@types%2fcodemirror cache-miss
+109 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fopenbsd-x64 550ms (cache miss)
+110 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-x64 set size:undefined disposed:false
+111 silly fetch manifest moment@2.29.4
+112 silly packumentCache full:https://registry.npmjs.org/moment cache-miss
+113 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-s390x 795ms (cache miss)
+114 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-s390x set size:undefined disposed:false
+115 silly fetch manifest crelt@^1.0.6
+116 silly packumentCache full:https://registry.npmjs.org/crelt cache-miss
+117 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-arm64 801ms (cache miss)
+118 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-arm64 set size:undefined disposed:false
+119 silly fetch manifest style-mod@^4.1.0
+120 silly packumentCache full:https://registry.npmjs.org/style-mod cache-miss
+121 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-arm 985ms (cache miss)
+122 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm set size:undefined disposed:false
+123 silly fetch manifest w3c-keyname@^2.2.4
+124 silly packumentCache full:https://registry.npmjs.org/w3c-keyname cache-miss
+125 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fdarwin-arm64 1046ms (cache miss)
+126 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-arm64 set size:undefined disposed:false
+127 silly fetch manifest @marijn/find-cluster-break@^1.0.0
+128 silly packumentCache full:https://registry.npmjs.org/@marijn%2ffind-cluster-break cache-miss
+129 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-arm64 1052ms (cache miss)
+130 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm64 set size:undefined disposed:false
+131 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fsunos-x64 1062ms (cache miss)
+132 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fsunos-x64 set size:undefined disposed:false
+133 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-x64 1081ms (cache miss)
+134 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-x64 set size:undefined disposed:false
+135 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-ia32 1299ms (cache miss)
+136 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ia32 set size:undefined disposed:false
+137 http fetch GET 200 https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 1309ms (cache miss)
+138 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 set size:undefined disposed:false
+139 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-riscv64 1315ms (cache miss)
+140 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-riscv64 set size:undefined disposed:false
+141 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-loong64 1320ms (cache miss)
+142 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-loong64 set size:undefined disposed:false
+143 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-ppc64 1507ms (cache miss)
+144 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ppc64 set size:undefined disposed:false
+145 http fetch GET 200 https://registry.npmjs.org/crelt 726ms (cache miss)
+146 silly packumentCache full:https://registry.npmjs.org/crelt set size:undefined disposed:false
+147 http fetch GET 200 https://registry.npmjs.org/moment 992ms (cache miss)
+148 silly packumentCache full:https://registry.npmjs.org/moment set size:undefined disposed:false
+149 http fetch GET 200 https://registry.npmjs.org/w3c-keyname 573ms (cache miss)
+150 silly packumentCache full:https://registry.npmjs.org/w3c-keyname set size:undefined disposed:false
+151 http fetch GET 200 https://registry.npmjs.org/style-mod 757ms (cache miss)
+152 silly packumentCache full:https://registry.npmjs.org/style-mod set size:undefined disposed:false
+153 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-x64 1579ms (cache miss)
+154 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-x64 set size:undefined disposed:false
+155 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-x64 1580ms (cache miss)
+156 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-x64 set size:undefined disposed:false
+157 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-mips64el 1334ms (cache miss)
+158 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-mips64el set size:undefined disposed:false
+159 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-ia32 1679ms (cache miss)
+160 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-ia32 set size:undefined disposed:false
+161 http fetch GET 200 https://registry.npmjs.org/@marijn%2ffind-cluster-break 684ms (cache miss)
+162 silly packumentCache full:https://registry.npmjs.org/@marijn%2ffind-cluster-break set size:undefined disposed:false
+163 http fetch GET 200 https://registry.npmjs.org/@types%2fcodemirror 1432ms (cache miss)
+164 silly packumentCache full:https://registry.npmjs.org/@types%2fcodemirror set size:undefined disposed:false
+165 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-arm 1753ms (cache miss)
+166 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm set size:undefined disposed:false
+167 http fetch GET 200 https://registry.npmjs.org/@esbuild%2ffreebsd-x64 2679ms (cache miss)
+168 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-x64 set size:undefined disposed:false
+169 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fdarwin-x64 2687ms (cache miss)
+170 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-x64 set size:undefined disposed:false
+171 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-arm64 4658ms (cache miss)
+172 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm64 set size:undefined disposed:false
+173 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fnetbsd-x64 6143ms (cache miss)
+174 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-x64 set size:undefined disposed:false
+175 silly placeDep ROOT @marijn/find-cluster-break@1.0.3 OK for: @codemirror/state@6.5.0 want: ^1.0.0
+176 silly placeDep ROOT crelt@1.0.7 OK for: @codemirror/view@6.38.6 want: ^1.0.6
+177 silly placeDep ROOT style-mod@4.1.3 OK for: @codemirror/view@6.38.6 want: ^4.1.0
+178 silly placeDep ROOT w3c-keyname@2.2.8 OK for: @codemirror/view@6.38.6 want: ^2.2.4
+179 silly placeDep ROOT undici-types@6.21.0 OK for: @types/node@20.19.43 want: ~6.21.0
+180 silly placeDep ROOT @esbuild/aix-ppc64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+181 silly placeDep ROOT @esbuild/android-arm@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+182 silly placeDep ROOT @esbuild/android-arm64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+183 silly placeDep ROOT @esbuild/android-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+184 silly placeDep ROOT @esbuild/darwin-arm64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+185 silly placeDep ROOT @esbuild/darwin-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+186 silly placeDep ROOT @esbuild/freebsd-arm64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+187 silly placeDep ROOT @esbuild/freebsd-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+188 silly placeDep ROOT @esbuild/linux-arm@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+189 silly placeDep ROOT @esbuild/linux-arm64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+190 silly placeDep ROOT @esbuild/linux-ia32@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+191 silly placeDep ROOT @esbuild/linux-loong64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+192 silly placeDep ROOT @esbuild/linux-mips64el@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+193 silly placeDep ROOT @esbuild/linux-ppc64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+194 silly placeDep ROOT @esbuild/linux-riscv64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+195 silly placeDep ROOT @esbuild/linux-s390x@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+196 silly placeDep ROOT @esbuild/linux-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+197 silly placeDep ROOT @esbuild/netbsd-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+198 silly placeDep ROOT @esbuild/openbsd-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+199 silly placeDep ROOT @esbuild/sunos-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+200 silly placeDep ROOT @esbuild/win32-arm64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+201 silly placeDep ROOT @esbuild/win32-ia32@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+202 silly placeDep ROOT @esbuild/win32-x64@0.20.2 OK for: esbuild@0.20.2 want: 0.20.2
+203 silly placeDep ROOT @types/codemirror@5.60.8 OK for: obsidian@1.13.1 want: 5.60.8
+204 silly placeDep ROOT moment@2.29.4 OK for: obsidian@1.13.1 want: 2.29.4
+205 silly fetch manifest @types/tern@*
+206 silly packumentCache full:https://registry.npmjs.org/@types%2ftern cache-miss
+207 http fetch GET 200 https://registry.npmjs.org/@types%2ftern 251ms (cache miss)
+208 silly packumentCache full:https://registry.npmjs.org/@types%2ftern set size:undefined disposed:false
+209 silly placeDep ROOT @types/tern@0.23.9 OK for: @types/codemirror@5.60.8 want: *
+210 silly fetch manifest @types/estree@*
+211 silly packumentCache full:https://registry.npmjs.org/@types%2festree cache-miss
+212 http fetch GET 200 https://registry.npmjs.org/@types%2festree 241ms (cache miss)
+213 silly packumentCache full:https://registry.npmjs.org/@types%2festree set size:undefined disposed:false
+214 silly placeDep ROOT @types/estree@1.0.9 OK for: @types/tern@0.23.9 want: *
+215 silly reify moves {}
+216 http cache @types/estree@https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz 0ms (cache hit)
+217 http cache @types/tern@https://registry.npmjs.org/@types/tern/-/tern-0.23.9.tgz 0ms (cache hit)
+218 http cache moment@https://registry.npmjs.org/moment/-/moment-2.29.4.tgz 0ms (cache hit)
+219 http cache @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.20.2.tgz 0ms (cache hit)
+220 http cache @types/codemirror@https://registry.npmjs.org/@types/codemirror/-/codemirror-5.60.8.tgz 0ms (cache hit)
+221 http cache w3c-keyname@https://registry.npmjs.org/w3c-keyname/-/w3c-keyname-2.2.8.tgz 0ms (cache hit)
+222 http cache style-mod@https://registry.npmjs.org/style-mod/-/style-mod-4.1.3.tgz 0ms (cache hit)
+223 http cache @marijn/find-cluster-break@https://registry.npmjs.org/@marijn/find-cluster-break/-/find-cluster-break-1.0.3.tgz 0ms (cache hit)
+224 http cache undici-types@https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz 0ms (cache hit)
+225 http cache crelt@https://registry.npmjs.org/crelt/-/crelt-1.0.7.tgz 0ms (cache hit)
+226 http cache tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 0ms (cache hit)
+227 http cache typescript@https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz 0ms (cache hit)
+228 http cache @codemirror/view@https://registry.npmjs.org/@codemirror/view/-/view-6.38.6.tgz 0ms (cache hit)
+229 http cache obsidian@https://registry.npmjs.org/obsidian/-/obsidian-1.13.1.tgz 0ms (cache hit)
+230 http cache @types/node@https://registry.npmjs.org/@types/node/-/node-20.19.43.tgz 0ms (cache hit)
+231 http cache @codemirror/state@https://registry.npmjs.org/@codemirror/state/-/state-6.5.0.tgz 0ms (cache hit)
+232 silly tarball no local data for @types/estree@https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz. Extracting by manifest.
+233 silly tarball no local data for @types/tern@https://registry.npmjs.org/@types/tern/-/tern-0.23.9.tgz. Extracting by manifest.
+234 silly tarball no local data for moment@https://registry.npmjs.org/moment/-/moment-2.29.4.tgz. Extracting by manifest.
+235 silly tarball no local data for @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.20.2.tgz. Extracting by manifest.
+236 silly tarball no local data for @types/codemirror@https://registry.npmjs.org/@types/codemirror/-/codemirror-5.60.8.tgz. Extracting by manifest.
+237 silly tarball no local data for w3c-keyname@https://registry.npmjs.org/w3c-keyname/-/w3c-keyname-2.2.8.tgz. Extracting by manifest.
+238 silly tarball no local data for style-mod@https://registry.npmjs.org/style-mod/-/style-mod-4.1.3.tgz. Extracting by manifest.
+239 silly tarball no local data for @marijn/find-cluster-break@https://registry.npmjs.org/@marijn/find-cluster-break/-/find-cluster-break-1.0.3.tgz. Extracting by manifest.
+240 silly tarball no local data for undici-types@https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz. Extracting by manifest.
+241 silly tarball no local data for crelt@https://registry.npmjs.org/crelt/-/crelt-1.0.7.tgz. Extracting by manifest.
+242 silly tarball no local data for tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz. Extracting by manifest.
+243 silly tarball no local data for typescript@https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz. Extracting by manifest.
+244 silly tarball no local data for @codemirror/view@https://registry.npmjs.org/@codemirror/view/-/view-6.38.6.tgz. Extracting by manifest.
+245 silly tarball no local data for obsidian@https://registry.npmjs.org/obsidian/-/obsidian-1.13.1.tgz. Extracting by manifest.
+246 silly tarball no local data for @types/node@https://registry.npmjs.org/@types/node/-/node-20.19.43.tgz. Extracting by manifest.
+247 http cache builtin-modules@https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz 0ms (cache hit)
+248 http cache esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.20.2.tgz 0ms (cache hit)
+249 silly tarball no local data for @codemirror/state@https://registry.npmjs.org/@codemirror/state/-/state-6.5.0.tgz. Extracting by manifest.
+250 silly tarball no local data for builtin-modules@https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz. Extracting by manifest.
+251 silly tarball no local data for esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.20.2.tgz. Extracting by manifest.
+252 http fetch GET 200 https://registry.npmjs.org/@types/tern/-/tern-0.23.9.tgz 266ms (cache miss)
+253 http fetch GET 200 https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz 269ms (cache miss)
+254 http fetch GET 200 https://registry.npmjs.org/w3c-keyname/-/w3c-keyname-2.2.8.tgz 271ms (cache miss)
+255 http fetch GET 200 https://registry.npmjs.org/style-mod/-/style-mod-4.1.3.tgz 283ms (cache miss)
+256 http fetch GET 200 https://registry.npmjs.org/@marijn/find-cluster-break/-/find-cluster-break-1.0.3.tgz 283ms (cache miss)
+257 http fetch GET 200 https://registry.npmjs.org/@types/node/-/node-20.19.43.tgz 431ms (cache miss)
+258 http fetch GET 200 https://registry.npmjs.org/@types/codemirror/-/codemirror-5.60.8.tgz 453ms (cache miss)
+259 http fetch GET 200 https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz 464ms (cache miss)
+260 http fetch GET 200 https://registry.npmjs.org/crelt/-/crelt-1.0.7.tgz 563ms (cache miss)
+261 http fetch GET 200 https://registry.npmjs.org/esbuild/-/esbuild-0.20.2.tgz 554ms (cache miss)
+262 http fetch GET 200 https://registry.npmjs.org/obsidian/-/obsidian-1.13.1.tgz 578ms (cache miss)
+263 http fetch GET 200 https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 587ms (cache miss)
+264 http fetch GET 200 https://registry.npmjs.org/@codemirror/state/-/state-6.5.0.tgz 920ms (cache miss)
+265 http fetch GET 200 https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz 1403ms (cache miss)
+266 http fetch GET 200 https://registry.npmjs.org/@codemirror/view/-/view-6.38.6.tgz 2539ms (cache miss)
+267 http fetch GET 200 https://registry.npmjs.org/moment/-/moment-2.29.4.tgz 7325ms (cache miss)
+268 http fetch GET 200 https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.20.2.tgz 16402ms (cache miss)
+269 http fetch GET 200 https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz 41794ms (cache miss)
+270 info run esbuild@0.20.2 postinstall node_modules/esbuild node install.js
+271 info run esbuild@0.20.2 postinstall { code: 'EPERM', signal: undefined }
+272 warn cleanup Failed to remove some directories [
+272 warn cleanup   [
+272 warn cleanup     '\\\\?\\D:\\Code\\Codex\\PunctFlow\\node_modules',
+272 warn cleanup     [Error: EPERM: operation not permitted, rmdir 'D:\Code\Codex\PunctFlow\node_modules\moment'] {
+272 warn cleanup       errno: -4048,
+272 warn cleanup       code: 'EPERM',
+272 warn cleanup       syscall: 'rmdir',
+272 warn cleanup       path: 'D:\\Code\\Codex\\PunctFlow\\node_modules\\moment'
+272 warn cleanup     }
+272 warn cleanup   ]
+272 warn cleanup ]
+273 verbose stack Error: spawn EPERM
+273 verbose stack     at ChildProcess.spawn (node:internal/child_process:441:11)
+273 verbose stack     at spawn (node:child_process:796:9)
+273 verbose stack     at promiseSpawn (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:39:16)
+273 verbose stack     at spawnWithShell (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:124:10)
+273 verbose stack     at promiseSpawn (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:12:12)
+273 verbose stack     at runScriptPkg (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\run-script\lib\run-script-pkg.js:79:13)
+273 verbose stack     at runScript (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\run-script\lib\run-script.js:9:12)
+273 verbose stack     at D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\rebuild.js:341:17
+273 verbose stack     at run (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\promise-call-limit\dist\commonjs\index.js:67:22)
+273 verbose stack     at D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\promise-call-limit\dist\commonjs\index.js:84:9
+274 error code EPERM
+275 error syscall spawn
+276 error errno -4048
+277 error Error: spawn EPERM
+277 error     at ChildProcess.spawn (node:internal/child_process:441:11)
+277 error     at spawn (node:child_process:796:9)
+277 error     at promiseSpawn (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:39:16)
+277 error     at spawnWithShell (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:124:10)
+277 error     at promiseSpawn (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:12:12)
+277 error     at runScriptPkg (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\run-script\lib\run-script-pkg.js:79:13)
+277 error     at runScript (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\run-script\lib\run-script.js:9:12)
+277 error     at D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\rebuild.js:341:17
+277 error     at run (D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\promise-call-limit\dist\commonjs\index.js:67:22)
+277 error     at D:\B_development\Nodejs_24-18-0\node_modules\npm\node_modules\promise-call-limit\dist\commonjs\index.js:84:9 {
+277 error   errno: -4048,
+277 error   code: 'EPERM',
+277 error   syscall: 'spawn'
+277 error }
+278 error
+278 error The operation was rejected by your operating system.
+278 error It's possible that the file was already in use (by a text editor or antivirus), or that you lack permissions to access it.
+278 error
+278 error If you believe this might be a permissions issue, please double-check the permissions of the file and its containing directories, or try running the command again as root/Administrator.
+279 silly unfinished npm timer reify 1787228743537
+280 silly unfinished npm timer reify:build 1787228797752
+281 silly unfinished npm timer build 1787228797752
+282 silly unfinished npm timer build:deps 1787228797752
+283 silly unfinished npm timer build:run:postinstall 1787228797808
+284 silly unfinished npm timer build:run:postinstall:node_modules/esbuild 1787228797809
+285 verbose cwd D:\Code\Codex\PunctFlow
+286 verbose os Windows_NT 10.0.26200
+287 verbose node v24.18.0
+288 verbose npm  v11.16.0
+289 notice
+289 notice New major version of npm available! 11.16.0 -> 12.0.2
+289 notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.2
+289 notice To update run: npm install -g npm@12.0.2
+289 notice  { force: true, Symbol(proc-log.meta): true }
+290 verbose exit -4048
+291 verbose code -4048
+292 error A complete log of this run can be found in: D:\Code\Codex\PunctFlow\.npm-cache\_logs\2026-08-20T12_25_43_280Z-debug-0.log
