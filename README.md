@@ -1,5 +1,8 @@
 # PunctFlow · 标点流
 
+PunctFlow is an Obsidian plugin that helps you manage punctuation in your notes efficiently.  
+It provides quick actions to insert, format, and correct punctuation marks.
+
 > 中文 Markdown 智能标点转换 —— 在中文输入法下，自动将常用的中文标点转换为对应的英文 Markdown 标点，减少中英文输入法切换成本。核心设计原则：**智能、可控、不误伤**。
 
 PunctFlow 是插件 [dot-to-backtick](https://github.com/)（输入中文间隔号 `·` 自动替换为反引号 `` ` ``）的升级版，扩展为通用的中文标点智能转换工具。

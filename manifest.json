@@ -2,8 +2,8 @@
   "id": "punctflow",
   "name": "PunctFlow",
   "version": "1.0.1",
-  "minAppVersion": "1.4.0",
-  "description": "标点流 — 中文 Markdown 智能标点转换：在中文输入法下输入中文标点（如 ·）时自动转换为对应的英文 Markdown 标点（如反引号 `），支持上下文感知、反引号自动配对与批量转换。",
+  "minAppVersion": "1.5.0",
+  "description": "标点流 — 中文 Markdown 智能标点转换：在中文输入法下输入中文标点（如 ·）时自动转换为对应的英文 Markdown 标点（如反引号 `），支持上下文感知、反引号自动配对与批量转换.",
   "author": "Che-Year",
   "authorUrl": "",
   "isDesktopOnly": false
