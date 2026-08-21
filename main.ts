@@ -1,4 +1,12 @@
-import { App, Editor, EditorPosition, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {
+  App,
+  Editor,
+  EditorPosition,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  type SettingDefinitionItem,
+} from 'obsidian';
 
 /* ============================================================
  * PunctFlow — 标点流：中文 Markdown 智能标点转换
@@ -66,6 +74,72 @@ const DEFAULT_SETTINGS: PunctFlowSettings = {
  */
 const EXCLUDED_NODE_TYPES = /code|math|url|autolink|link|image|html|comment|frontmatter|yaml/i;
 
+// -------------------- 编辑器运行时结构（最小化结构化访问） --------------------
+//
+// Obsidian 的 editor-change 事件与 Editor 内部持有的 CodeMirror 6 视图均未公开
+// 完整类型，不同版本形态不一。这里只声明实际访问到的成员，避免使用 any。
+
+/** editor-change 事件携带的变更对象（兼容 Obsidian EditorChange / CM6 Transaction / ViewUpdate 等形态） */
+interface EditorChangeLike {
+  /** Obsidian EditorChange 形态：text 字段 */
+  text?: string | string[];
+  /** CM6 TransactionSpec 风格：insert 字段 */
+  insert?: string | string[];
+  /** CM6 ViewUpdate 形态：changes.iterChanges 遍历器 */
+  changes?: { iterChanges?: (cb: IterChangesCallback) => void };
+  /** 位置对（可能是 EditorPosition 或数字偏移） */
+  from?: EditorPosition | number;
+  to?: EditorPosition | number;
+}
+
+/** CM6 ChangeSet.iterChanges 的回调签名（inserted 为 CodeMirror Text 的最小接口） */
+type IterChangesCallback = (
+  fromA: number,
+  toA: number,
+  fromB: number,
+  toB: number,
+  inserted: { toString(): string; length: number }
+) => void;
+
+/** Obsidian Editor 内部持有的 CodeMirror 6 EditorView 的最小结构化接口 */
+interface CM6ViewLike {
+  state?: CM6StateLike;
+  inputState?: { composition?: unknown };
+  dispatch?: (spec: CM6DispatchSpec) => void;
+}
+
+/** CM6 EditorState 的最小结构化接口 */
+interface CM6StateLike {
+  doc?: { length: number };
+  tree?: SyntaxTree;
+  fields?: unknown[];
+  field?: (field: unknown, require: boolean) => unknown;
+}
+
+/** CM6 单事务分发参数（changes + selection 一次完成，保证单次撤销） */
+interface CM6DispatchSpec {
+  changes: { from: number; to: number; insert: string };
+  selection: { anchor: number };
+}
+
+/** lezer 语法树节点的最小结构化接口（用于 iterate 回调） */
+interface SyntaxTreeNodeRef {
+  type: { name: string };
+  from: number;
+  to: number;
+}
+
+/** lezer 语法树节点（resolveInner 返回，含父节点链） */
+interface SyntaxTreeNode extends SyntaxTreeNodeRef {
+  parent: SyntaxTreeNode | null;
+}
+
+/** lezer 语法树的最小结构化接口 */
+interface SyntaxTree {
+  resolveInner(pos: number, side?: number): SyntaxTreeNode;
+  iterate(spec: { from: number; to: number; enter: (node: SyntaxTreeNodeRef) => boolean | void }): void;
+}
+
 // -------------------- 纯工具函数 --------------------
 
 /** 判断是否为中文字符（用于中文人名间隔号保护） */
@@ -96,22 +170,17 @@ export default class PunctFlowPlugin extends Plugin {
   /** 上一次 editor-change 时文档长度（用于兜底检测插入/删除） */
   private lastDocLength = -1;
 
-  /** 是否已提示过未知 change 结构（避免刷屏） */
-  private warnedUnknownChange = false;
-
   async onload() {
     await this.loadSettings();
 
-    // 加载日志：可在 Obsidian 开发者工具（Ctrl+Shift+I → Console）中确认插件状态
-    console.log(
-      `[PunctFlow] 插件已加载。工作模式：${this.settings.mode}，映射规则数：${this.settings.mappings.length}，自动配对：${this.settings.autoPairBacktick}`
-    );
-
     // ---------- 实时模式：监听编辑器变化 ----------
     this.registerEvent(
-      this.app.workspace.on('editor-change', (editor: Editor, change: any) => {
+      // 说明：Obsidian 官方类型把该事件第二参数标为 MarkdownView/MarkdownFileInfo，
+      // 但运行时实际传入的是变更对象（EditorChange/CM6 事务/ViewUpdate 等形态）。
+      // 这里用 unknown 承接后再按 EditorChangeLike 结构化访问，避免 any。
+      this.app.workspace.on('editor-change', (editor: Editor, change: unknown) => {
         if (this.settings.mode !== 'realtime') return;
-        this.handleRealtimeChange(editor, change);
+        this.handleRealtimeChange(editor, change as EditorChangeLike | null);
       })
     );
 
@@ -164,13 +233,13 @@ export default class PunctFlowPlugin extends Plugin {
    * 处理实时输入：把映射字符替换为目标字符串。
    * 只处理「单字符插入」这一类变化；删除、粘贴、多行修改一律忽略。
    */
-  private handleRealtimeChange(editor: Editor, change: any): void {
+  private handleRealtimeChange(editor: Editor, change: EditorChangeLike | null): void {
     // 工作模式守卫：仅实时模式自动转换（事件包装器与这里双重检查，纵深防御）
     if (this.settings.mode !== 'realtime') return;
 
     // 记录本次修改后的文档长度（供下一次兜底检测判断插入/删除）
-    const cm = (editor as any).cm;
-    const docLen = cm && cm.state && cm.state.doc ? cm.state.doc.length : editor.getValue().length;
+    const cm = this.getCM6View(editor);
+    const docLen = cm?.state?.doc?.length ?? editor.getValue().length;
 
     // 自身修改触发的事件：只同步长度后返回，防止死循环
     if (this.isApplying) {
@@ -180,7 +249,7 @@ export default class PunctFlowPlugin extends Plugin {
 
     // IME（输入法）组合输入过程中不处理，避免打断中文输入。
     // 注意：CM6 的组合状态在 view.inputState.composition（不是 state.composition）。
-    if (cm && cm.inputState && cm.inputState.composition) {
+    if (cm?.inputState?.composition) {
       this.lastDocLength = docLen;
       return;
     }
@@ -254,7 +323,7 @@ export default class PunctFlowPlugin extends Plugin {
    *   4. { from, to } 位置对 → 通过 editor.getRange 反查
    *   5. 兜底：光标前一字符 + 文档长度校验（确认是单字符插入而非删除）
    */
-  private getInsertedText(editor: Editor, change: any): string {
+  private getInsertedText(editor: Editor, change: EditorChangeLike | null): string {
     if (change) {
       // 1) text 字段（Obsidian EditorChange 的标准形态）
       if (typeof change.text === 'string') return change.text;
@@ -269,13 +338,13 @@ export default class PunctFlowPlugin extends Plugin {
         let found = '';
         try {
           change.changes.iterChanges(
-            (_fromA: number, _toA: number, fromB: number, toB: number, inserted: any) => {
+            (_fromA: number, _toA: number, fromB: number, toB: number, inserted) => {
               if (!found && inserted && inserted.length === 1 && toB - fromB === 1) {
                 found = inserted.toString();
               }
             }
           );
-        } catch (e) {
+        } catch {
           /* ignore */
         }
         if (found) return found;
@@ -288,7 +357,7 @@ export default class PunctFlowPlugin extends Plugin {
           const toPos = typeof change.to === 'number' ? editor.offsetToPos(change.to) : change.to;
           const rangeText = editor.getRange(fromPos, toPos);
           if (rangeText.length === 1) return rangeText;
-        } catch (e) {
+        } catch {
           /* ignore */
         }
       }
@@ -300,12 +369,8 @@ export default class PunctFlowPlugin extends Plugin {
     if (cursor.ch > 0) {
       const prevChar = this.getCharBefore(editor, cursor);
       if (prevChar && this.settings.mappings.some((m) => m.from === prevChar)) {
-        const docLen = (editor as any).cm?.state?.doc?.length ?? editor.getValue().length;
+        const docLen = this.getCM6View(editor)?.state?.doc?.length ?? editor.getValue().length;
         if (this.lastDocLength !== -1 && docLen === this.lastDocLength + 1) {
-          if (!this.warnedUnknownChange) {
-            this.warnedUnknownChange = true;
-            console.log('[PunctFlow] 检测到未知的 editor-change 结构，已启用兜底检测。change =', change);
-          }
           return prevChar;
         }
       }
@@ -323,7 +388,7 @@ export default class PunctFlowPlugin extends Plugin {
     replacement: string,
     cursorDelta: number
   ): void {
-    const cm = (editor as any).cm;
+    const cm = this.getCM6View(editor);
     const offset = editor.posToOffset(typedPos);
     this.isApplying = true;
     try {
@@ -347,6 +412,8 @@ export default class PunctFlowPlugin extends Plugin {
 
   /** 粘贴模式下：对粘贴内容执行映射转换（粘贴位置位于排除上下文时原样粘贴） */
   private handlePaste(evt: ClipboardEvent, editor: Editor): void {
+    // 事件规范：事件已被其他处理器接管（defaultPrevented）时立即返回，避免重复处理
+    if (evt.defaultPrevented) return;
     if (this.isApplying) return;
     const text = evt.clipboardData ? evt.clipboardData.getData('text') : '';
     if (!text) return;
@@ -489,7 +556,7 @@ export default class PunctFlowPlugin extends Plugin {
         // 取「被输入字符之后」的位置（offset + 1）做节点解析：
         // 若被输入字符紧跟在某个行内代码/链接之后（如 `code`· 想再开一个代码），
         // 用 -1 边会误落到左侧节点的结束边界上，导致被误伤；取 offset+1 更准确。
-        let node = tree.resolveInner(offset + 1, -1);
+        let node: SyntaxTreeNode | null = tree.resolveInner(offset + 1, -1);
         while (node) {
           const name = node.type.name;
           if (EXCLUDED_NODE_TYPES.test(name)) {
@@ -499,7 +566,7 @@ export default class PunctFlowPlugin extends Plugin {
           }
           node = node.parent;
         }
-      } catch (e) {
+      } catch {
         // 语法树解析异常 → 交给行内启发式
       }
     }
@@ -571,9 +638,14 @@ export default class PunctFlowPlugin extends Plugin {
    * 说明：不同 Obsidian 版本的编辑器状态结构略有差异，这里做了两级探测；
    * 若未来语法树访问方式变化，只需修改本方法（扩展点）。
    */
-  private getSyntaxTree(editor: Editor): any | null {
-    const cm = (editor as any).cm;
-    if (!cm || !cm.state) return null;
+  /**
+   * 尝试获取 CodeMirror 6 语法树；不可用时返回 null（回退启发式）。
+   * 说明：不同 Obsidian 版本的编辑器状态结构略有差异，这里做了两级探测；
+   * 若未来语法树访问方式变化，只需修改本方法（扩展点）。
+   */
+  private getSyntaxTree(editor: Editor): SyntaxTree | null {
+    const cm = this.getCM6View(editor);
+    if (!cm?.state) return null;
 
     // 方式一：直接访问 state.tree
     if (cm.state.tree) return cm.state.tree;
@@ -581,28 +653,41 @@ export default class PunctFlowPlugin extends Plugin {
     // 方式二：遍历 state 字段，寻找持有 lezer Tree（有 iterate / resolveInner）的字段
     // （@codemirror/language 的 Language state field 内部持有语法树）
     try {
-      const fields: any[] = cm.state.fields || [];
+      const fields: unknown[] = cm.state.fields ?? [];
       for (const f of fields) {
-        const val = cm.state.field(f, false);
-        if (val && typeof val.iterate === 'function' && typeof val.resolveInner === 'function') {
-          return val;
+        const val: unknown = cm.state.field ? cm.state.field(f, false) : undefined;
+        if (
+          val &&
+          typeof (val as SyntaxTree).iterate === 'function' &&
+          typeof (val as SyntaxTree).resolveInner === 'function'
+        ) {
+          return val as SyntaxTree;
         }
       }
-    } catch (e) {
+    } catch {
       /* ignore */
     }
 
     return null;
   }
 
+  /** 获取 Obsidian Editor 内部持有的 CodeMirror 6 视图（未公开 API，做最小化结构化访问） */
+  private getCM6View(editor: Editor): CM6ViewLike | null {
+    return (editor as unknown as { cm?: CM6ViewLike }).cm ?? null;
+  }
+
   /** 遍历语法树，收集 [from, to) 区间内的排除区间（调用方负责合并重叠） */
-  private getExcludedRangesFromTree(tree: any, from: number, to: number): { from: number; to: number }[] {
+  private getExcludedRangesFromTree(
+    tree: SyntaxTree,
+    from: number,
+    to: number
+  ): { from: number; to: number }[] {
     const ranges: { from: number; to: number }[] = [];
     try {
       tree.iterate({
         from,
         to,
-        enter: (node: any) => {
+        enter: (node) => {
           if (EXCLUDED_NODE_TYPES.test(node.type.name)) {
             ranges.push({ from: Math.max(node.from, from), to: Math.min(node.to, to) });
             return false; // 不深入子节点
@@ -610,7 +695,7 @@ export default class PunctFlowPlugin extends Plugin {
           return true;
         },
       });
-    } catch (e) {
+    } catch {
       /* ignore */
     }
     return ranges;
@@ -833,59 +918,138 @@ class PunctFlowSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
+  /**
+   * Obsidian ≥ 1.13.0：声明式设置定义。
+   * 返回非空数组时，框架以声明式渲染设置面板并支持「设置」全局搜索，
+   * 不再调用已弃用的 display()。
+   */
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    const s = this.plugin.settings;
+    return [
+      // ---------- 1. 标点映射表 ----------
+      {
+        name: '输入字符 → 输出字符串（目标可为空，表示删除）。规则按从上到下顺序匹配；实时模式只对单字符输入生效。',
+      },
+      {
+        type: 'list',
+        heading: '标点映射表',
+        cls: 'punctflow-mapping-list',
+        emptyState: '暂无映射规则，点击「添加映射」新增。',
+        items: s.mappings.map((m, idx) => ({
+          name: `映射规则 ${idx + 1}`,
+          desc: '输入字符 → 输出字符串（目标可为空 = 删除）',
+          render: (setting: Setting) => {
+            setting
+              .addText((t) =>
+                t
+                  .setPlaceholder('源字符，如 ·')
+                  .setValue(m.from)
+                  .onChange(async (v) => {
+                    m.from = v;
+                    await this.plugin.saveSettings();
+                  })
+              )
+              .addText((t) =>
+                t
+                  .setPlaceholder('目标，如 `')
+                  .setValue(m.to)
+                  .onChange(async (v) => {
+                    m.to = v;
+                    await this.plugin.saveSettings();
+                  })
+              );
+          },
+        })),
+        addItem: {
+          name: '添加映射',
+          action: async () => {
+            s.mappings.push({ from: '', to: '' });
+            await this.plugin.saveSettings();
+            this.rerender();
+          },
+        },
+        onDelete: async (index: number) => {
+          s.mappings.splice(index, 1);
+          await this.plugin.saveSettings();
+          this.rerender();
+        },
+      },
+      // ---------- 2. 自动配对反引号 ----------
+      {
+        name: '自动配对反引号',
+        desc: '输入 · 转换后自动插入一对反引号并将光标置于中间；再次输入 · 时自动跳过已存在的闭合反引号，避免重复。',
+        control: { type: 'toggle', key: 'autoPairBacktick', defaultValue: true },
+      },
+      // ---------- 3. 工作模式 ----------
+      {
+        name: '工作模式',
+        desc: '实时模式：输入时立即转换；手动模式：仅通过命令转换；粘贴模式：粘贴文本后自动转换粘贴内容。',
+        control: {
+          type: 'dropdown',
+          key: 'mode',
+          defaultValue: 'realtime',
+          options: {
+            realtime: '实时模式（默认）',
+            manual: '手动模式',
+            paste: '粘贴转换',
+          },
+        },
+      },
+      // ---------- 4. 排除文件夹 ----------
+      {
+        name: '排除文件夹',
+        desc: '在这些文件夹中的文件不进行转换，每行一个路径（相对仓库根目录），如：日记',
+        control: { type: 'textarea', key: 'excludedFolders', placeholder: '日记\n模板', defaultValue: '' },
+      },
+      // ---------- 5. 排除文件扩展名 ----------
+      {
+        name: '排除文件扩展名',
+        desc: '这些扩展名的文件不转换，每行一个，不带点，如：txt',
+        control: { type: 'textarea', key: 'excludedExtensions', placeholder: 'txt\nlog', defaultValue: '' },
+      },
+      // ---------- 6. 恢复默认映射 ----------
+      {
+        name: '恢复默认映射',
+        desc: '将映射表恢复为默认（· → `），其余设置保持不变。',
+        action: async () => {
+          s.mappings = DEFAULT_SETTINGS.mappings.map((m) => ({ ...m }));
+          await this.plugin.saveSettings();
+          this.rerender();
+        },
+      },
+    ];
+  }
+
+  /**
+   * 重新渲染设置面板：Obsidian ≥ 1.13.0 走声明式 update()，
+   * 旧版本（< 1.13.0）回退到 display()。
+   */
+  private rerender(): void {
+    if (typeof this.update === 'function') {
+      this.update();
+      return;
+    }
+    this.display();
+  }
+
+  /**
+   * Obsidian < 1.13.0 的兼容渲染（display 自 1.13.0 起弃用，
+   * 仅作为旧版本回退路径保留）。
+   */
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl('h2', { text: 'PunctFlow 设置' });
+    new Setting(containerEl).setName('PunctFlow 设置').setHeading();
 
     // ---------- 1. 映射表编辑器 ----------
-    containerEl.createEl('h3', { text: '标点映射表' });
+    new Setting(containerEl).setName('标点映射表').setHeading();
     containerEl
-      .createEl('p', { text: '输入字符 → 输出字符串（目标可为空，表示删除）。规则按从上到下顺序匹配。实时模式只对单字符输入生效。' })
-      .addClass('setting-item-description');
-
-    const list = containerEl.createDiv();
-    list.addClass('punctflow-mapping-list');
-
-    this.plugin.settings.mappings.forEach((m, idx) => {
-      const row = list.createDiv();
-      row.addClass('punctflow-mapping-row');
-      new Setting(row)
-        .addText((t) =>
-          t
-            .setPlaceholder('源字符，如 ·')
-            .setValue(m.from)
-            .onChange(async (v) => {
-              m.from = v;
-              await this.plugin.saveSettings();
-            })
-        )
-        .addText((t) =>
-          t
-            .setPlaceholder('目标，如 `')
-            .setValue(m.to)
-            .onChange(async (v) => {
-              m.to = v;
-              await this.plugin.saveSettings();
-            })
-        )
-        .addExtraButton((b) =>
-          b.setIcon('trash').setTooltip('删除该规则').onClick(async () => {
-            this.plugin.settings.mappings.splice(idx, 1);
-            await this.plugin.saveSettings();
-            this.display();
-          })
-        );
-    });
-
-    new Setting(containerEl).addButton((b) =>
-      b.setButtonText('+ 添加映射').setCta().onClick(async () => {
-        this.plugin.settings.mappings.push({ from: '', to: '' });
-        await this.plugin.saveSettings();
-        this.display();
+      .createEl('p', {
+        text: '输入字符 → 输出字符串（目标可为空，表示删除）。规则按从上到下顺序匹配。实时模式只对单字符输入生效。',
       })
-    );
+      .addClass('setting-item-description');
+    this.renderMappingRows(containerEl);
 
     // ---------- 2. 自动配对反引号 ----------
     new Setting(containerEl)
@@ -950,8 +1114,51 @@ class PunctFlowSettingTab extends PluginSettingTab {
         b.setButtonText('恢复默认').onClick(async () => {
           this.plugin.settings.mappings = DEFAULT_SETTINGS.mappings.map((m) => ({ ...m }));
           await this.plugin.saveSettings();
-          this.display(); // 重新渲染映射表
+          this.rerender(); // 重新渲染映射表
         })
       );
+  }
+
+  /** 渲染标点映射表（源字符 / 目标 / 删除）与「添加映射」按钮（供旧版本 display() 使用） */
+  private renderMappingRows(containerEl: HTMLElement): void {
+    const list = containerEl.createDiv({ cls: 'punctflow-mapping-list' });
+
+    this.plugin.settings.mappings.forEach((m, idx) => {
+      const row = list.createDiv({ cls: 'punctflow-mapping-row' });
+      new Setting(row)
+        .addText((t) =>
+          t
+            .setPlaceholder('源字符，如 ·')
+            .setValue(m.from)
+            .onChange(async (v) => {
+              m.from = v;
+              await this.plugin.saveSettings();
+            })
+        )
+        .addText((t) =>
+          t
+            .setPlaceholder('目标，如 `')
+            .setValue(m.to)
+            .onChange(async (v) => {
+              m.to = v;
+              await this.plugin.saveSettings();
+            })
+        )
+        .addExtraButton((b) =>
+          b.setIcon('trash').setTooltip('删除该规则').onClick(async () => {
+            this.plugin.settings.mappings.splice(idx, 1);
+            await this.plugin.saveSettings();
+            this.rerender();
+          })
+        );
+    });
+
+    new Setting(containerEl).addButton((b) =>
+      b.setButtonText('+ 添加映射').setCta().onClick(async () => {
+        this.plugin.settings.mappings.push({ from: '', to: '' });
+        await this.plugin.saveSettings();
+        this.rerender();
+      })
+    );
   }
 }

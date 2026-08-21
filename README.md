@@ -1,130 +1,131 @@
-# PunctFlow · 标点流
+# PunctFlow
 
-PunctFlow is an Obsidian plugin that helps you manage punctuation in your notes efficiently.  
-It provides quick actions to insert, format, and correct punctuation marks.
+[中文版本](./README.zh.md)
 
-> 中文 Markdown 智能标点转换 —— 在中文输入法下，自动将常用的中文标点转换为对应的英文 Markdown 标点，减少中英文输入法切换成本。核心设计原则：**智能、可控、不误伤**。
+**PunctFlow** is an Obsidian plugin that intelligently converts Chinese punctuation to the corresponding English Markdown punctuation while you type under a Chinese input method — most importantly `·` (interpunct) → `` ` `` (backtick) — reducing the cost of switching between Chinese and English input methods. Core design principles: **smart, controllable, and never harmful**.
 
-PunctFlow 是插件 [dot-to-backtick](https://github.com/)（输入中文间隔号 `·` 自动替换为反引号 `` ` ``）的升级版，扩展为通用的中文标点智能转换工具。
+It is an upgraded, generalized version of the [dot-to-backtick](https://github.com/) plugin (which replaces the Chinese interpunct `·` with a backtick `` ` ``), extended into a universal smart converter for Chinese punctuation.
 
-## ✨ 功能特性
+## ✨ Features
 
-| 功能 | 说明 |
+| Feature | Description |
 | --- | --- |
-| 🔧 可配置映射表 | 默认 `·` → `` ` ``；可在设置中增删改任意映射（目标可为空 = 删除） |
-| 🧠 上下文感知 | 代码块、行内代码、数学公式、URL、链接文本、frontmatter 中不转换；中文人名间隔号（卡尔·马克思）不转换 |
-| ⚡ 反引号自动配对 | 输入 `·` 自动插入一对 `` ` `` 并把光标置于中间；再输入一次 `·` 自动跳过闭合反引号，绝不出现重复 |
-| 🖥 批量转换命令 | 转换选区 / 转换当前行 / 转换全文（未选中时选区自动降级为当前行） |
-| 🎛 三种工作模式 | 实时模式（默认）/ 手动模式 / 粘贴转换 |
-| 🚫 排除规则 | 按文件夹路径、按文件扩展名排除；frontmatter 默认不转换 |
-| ↩️ 撤销合并 | 每次转换只产生一个事务，一次 Ctrl+Z 即可撤销 |
+| 🔧 Configurable mapping table | Default `·` → `` ` ``; add, edit, or remove any mapping in the settings (empty target = delete the character) |
+| 🧠 Context awareness | No conversion inside code blocks, inline code, math formulas, URLs, link text, or frontmatter; Chinese personal-name interpuncts (卡尔·马克思) are never converted |
+| ⚡ Backtick auto-pairing | Typing `·` inserts a pair of backticks and places the cursor between them; typing `·` again skips past the closing backtick so duplicates never appear |
+| 🖥 Batch conversion commands | Convert selection / current line / whole document (selection falls back to the current line when nothing is selected) |
+| 🎛 Three working modes | Realtime mode (default) / manual mode / paste conversion |
+| 🚫 Exclusion rules | Exclude files by folder path or file extension; frontmatter is not converted by default |
+| ↩️ Undo merging | Each conversion produces a single transaction, so one `Ctrl+Z` undoes it |
 
-## 📦 安装
+## 📦 Installation
 
-1. 构建插件（需 [Node.js](https://nodejs.org/) ≥ 18）：
+1. Build the plugin (requires [Node.js](https://nodejs.org/) ≥ 18):
    ```bash
    npm install
    npm run build
    ```
-2. 将整个项目文件夹复制到你的仓库的 `.obsidian/plugins/obsidian-punctflow/` 目录下（确保包含 `main.js`、`manifest.json`、`styles.css`）。
-3. 在 Obsidian 中打开「设置 → 第三方插件」，启用 **PunctFlow**。
+2. Copy the project folder into `<your-vault>/.obsidian/plugins/punctflow/` (make sure it contains `main.js`, `manifest.json`, and `styles.css`).
+3. In Obsidian, open **Settings → Community plugins**, and enable **PunctFlow**.
 
-> 插件 ID 为 `obsidian-punctflow`。
+> Plugin ID: `punctflow`.
 
-## ⚙️ 配置
+## ⚙️ Configuration
 
-打开「设置 → PunctFlow 设置」：
+Open **Settings → PunctFlow settings**:
 
-1. **标点映射表**：每行一条「源字符 → 目标字符串」。目标留空表示删除该字符。规则按从上到下的顺序匹配（第一条命中生效）。可点击「+ 添加映射」新增、「🗑」删除，或「恢复默认」还原为 `·` → `` ` ``。
-2. **自动配对反引号**：开启后输入 `·` 会自动插入一对反引号并居中光标；再次输入 `·` 时自动跳过已存在的闭合反引号。
-3. **工作模式**：
-   - **实时模式（默认）**：输入映射字符时立即转换；
-   - **手动模式**：不自动转换，只通过命令触发；
-   - **粘贴转换**：粘贴文本后自动对粘贴内容执行映射转换。
-4. **排除文件夹**：每行一个路径（相对仓库根目录，如 `日记`），这些文件夹中的文件不转换。
-5. **排除文件扩展名**：每行一个（不带点，如 `txt`），这些文件不转换。
+1. **Punctuation mapping table**: each entry is a "source character → target string". Leaving the target empty deletes the character. Rules are matched from top to bottom (the first hit wins). Use **+ Add mapping** to add, the trash icon to delete, or **Reset mappings** to restore `·` → `` ` ``.
+2. **Auto-pair backticks**: when enabled, typing `·` inserts a pair of backticks with the cursor centered; typing `·` again skips past an existing closing backtick.
+3. **Working mode**:
+   - **Realtime (default)**: converts immediately as you type a mapped character;
+   - **Manual**: never auto-converts; conversion happens only through commands;
+   - **Paste conversion**: converts pasted content automatically after a paste.
+4. **Excluded folders**: one path per line (relative to the vault root, e.g. `journal`); files inside these folders are not converted.
+5. **Excluded file extensions**: one per line without the dot (e.g. `txt`); files with these extensions are not converted.
 
-## 🎮 使用
+## 🎮 Usage
 
-- **实时输入**：在中文输入法下，直接输入 `·`（通常是反引号键 `` ` ``），插件会自动把它变成 `` ` `` 并完成配对；输入 `。`、`，` 等映射字符同理（取决于你的映射表）。
-- **命令面板**（Ctrl/Cmd + P）：
-  - `PunctFlow: 转换选区`（未选中时转换当前行）
-  - `PunctFlow: 转换当前行`
-  - `PunctFlow: 转换全文`
-- **粘贴转换**：把工作模式切到「粘贴转换」后，粘贴的内容会自动转换。
+- **Realtime input**: with a Chinese input method active, type `·` (usually the backtick key) and the plugin turns it into `` ` `` with auto-pairing; mapped characters such as `。` or `，` behave the same way (depending on your mapping table).
+- **Command palette** (Ctrl/Cmd + P):
+  - `PunctFlow: Convert selection` (falls back to the current line when nothing is selected)
+  - `PunctFlow: Convert current line`
+  - `PunctFlow: Convert whole document`
+- **Paste conversion**: switch the working mode to "Paste conversion", then pasted content is converted automatically.
 
-### 典型输入流程（反引号自动配对）
+### Typical flow (backtick auto-pairing)
 
-1. 光标处输入 `·` → 自动插入 `` `` ``，光标位于中间；
-2. 输入代码内容 → `` `code` ``；
-3. 再输入一次 `·` → 光标自动跳过闭合反引号，不会产生重复反引号。
+1. Type `·` at the cursor → `` `` `` is inserted and the cursor is placed between the backticks;
+2. Type your code → `` `code` ``;
+3. Type `·` once more → the cursor skips past the closing backtick, no duplicate backticks.
 
-### 不转换的场景（自动识别）
+### Scenarios that are never converted (auto-detected)
 
 ```md
 ```js
-// 代码块内的 · 不转换
-const a = '卡尔·马克思';   // 中文人名间隔号不转换
+// The · inside code blocks is not converted
+const a = '卡尔·马克思';   // Chinese personal-name interpuncts are not converted
 ```
 
-`行内代码里的·不转换`，`$公式里的·不转换$`，[链接文本·不转换](https://example.com)。
+`The · inside inline code is not converted`, `$The · inside math is not converted$`, [link text · not converted](https://example.com).
 
 ```yaml
 ---
-title: frontmatter 里的·不转换
+title: The · inside frontmatter is not converted
 ---
 ```
 
-## 🧠 核心逻辑讲解
+## 🧠 How it works
 
-### 1. 上下文感知
+### 1. Context awareness
 
-转换前会做三级判断（按优先级）：
+Before converting, three levels of checks run (by priority):
 
-1. **行扫描**：从文件开头扫描，判断光标所在行是否位于 frontmatter（`---`…`---`）或围栏代码块（```` ``` ```` / `~~~`）内；
-2. **CodeMirror 6 语法树**：通过 `(editor as any).cm.state.tree` 获取语法树，用 `tree.resolveInner(offset)` 找到光标所在节点并向上遍历父节点，若节点名匹配 `code / math / url / link / image / html / comment / frontmatter` 等则跳过（特例：光标后紧跟反引号 = 正在闭合行内代码，允许转换）；
-3. **行内启发式**（语法树不可用时的兜底）：
-   - 光标前后都是中文字符且行内反引号为偶数 → 中文人名间隔号（`卡尔·马克思`），不转换；
-   - 光标前后反引号都为奇数 → 正处于行内代码内部，不转换；
-   - 光标前 `$` 为奇数 → 处于行内公式内部，不转换；
-   - 光标前紧邻 `https://...` → 处于 URL 内部，不转换。
+1. **Line scanning**: scans from the start of the file to determine whether the current line is inside frontmatter (`---`…`---`) or a fenced code block (```` ``` ```` / `~~~`);
+2. **CodeMirror 6 syntax tree**: the plugin reads the editor's internal CM6 state through a minimal structured interface and resolves the node at the cursor position with `tree.resolveInner(offset)`, then walks up the parent chain. If the node name matches `code / math / url / link / image / html / comment / frontmatter` and similar, conversion is skipped (special case: if the character right after the cursor is a backtick — the user is closing an inline code span — conversion is allowed);
+3. **Inline heuristics** (fallback when the syntax tree is unavailable):
+   - Both sides of the cursor are Chinese characters with an even number of backticks on the line → Chinese personal-name interpunct (`卡尔·马克思`), not converted;
+   - Odd numbers of backticks both before and after the cursor → inside inline code, not converted;
+   - Odd number of `$` before the cursor → inside inline math, not converted;
+   - `https://...` immediately before the cursor → inside a URL, not converted.
 
-语法树不可用时，代码会自动回退到启发式规则，无需任何配置。
+When the syntax tree is unavailable, the plugin automatically falls back to the heuristics — no configuration needed.
 
-### 2. 反引号自动配对
+### 2. Backtick auto-pairing
 
-输入被映射为反引号的字符（`·`）且判定应转换时：
+When a character mapped to a backtick (`·`) is typed and conversion should happen:
 
-- **光标后没有反引号**：插入一对 `` `` ``，光标置于两个反引号之间（开启行内代码）；
-- **光标后已有一个反引号**（如自动配对产生的闭合反引号）：删除刚输入的字符并让光标跳过后面的反引号 —— 既完成“闭合”动作，又不会产生 `` `code`` `` 这样的重复反引号；
-- **行内反引号为奇数**（开始反引号是英文输入的，如 `` `code ``）：只插入一个反引号完成闭合。
+- **No backtick after the cursor**: insert a pair `` `` ``, placing the cursor between them (opening inline code);
+- **A backtick already follows the cursor** (e.g. the closing backtick produced by auto-pairing): delete the just-typed character and move the cursor past the existing backtick — this both "closes" the span and avoids duplicates like `` `code`` ``;
+- **Odd number of backticks on the line** (the opening backtick was typed in English mode, e.g. `` `code ``): insert a single closing backtick.
 
-### 3. 撤销合并
+### 3. Undo merging
 
-- **实时转换**：通过 `cm.dispatch({ changes, selection })` 在**单个 CodeMirror 事务**中同时完成替换与光标移动，一次 Ctrl+Z 即可撤销；
-- **批量转换**：整个区间只用一次 `editor.replaceRange()`，同样只产生一条撤销记录；
-- 全程使用 `isApplying` 守卫标记，防止插件自身修改触发 `editor-change` 造成死循环。
+- **Realtime conversion**: `cm.dispatch({ changes, selection })` performs the replacement and the cursor move in a **single CodeMirror transaction**, undoable with one `Ctrl+Z`;
+- **Batch conversion**: the whole range is replaced with a single `editor.replaceRange()`, also producing a single undo record;
+- The `isApplying` guard flag prevents the plugin's own edits from triggering `editor-change` and causing infinite loops.
 
-## 🛠 开发
+## 🛠 Development
 
 ```bash
-npm install      # 安装依赖
-npm run dev      # 监听模式构建（main.js）
-npm run build    # 生产构建（tsc 类型检查 + esbuild）
+npm install      # install dependencies
+npm run dev      # watch mode build (main.js)
+npm run build    # production build (tsc type check + esbuild)
+npm test         # run the simulation test suite
 ```
 
-### 项目结构
+### Project structure
 
 ```
-├── main.ts              # 插件主逻辑（含设置面板）
-├── manifest.json        # 插件清单
-├── styles.css           # 设置面板样式
-├── esbuild.config.mjs   # esbuild 构建配置
-├── tsconfig.json        # TypeScript 配置
-├── package.json         # 依赖与脚本
-└── versions.json        # 版本兼容声明
+├── main.ts              # plugin core logic (including the settings tab)
+├── manifest.json        # plugin manifest
+├── styles.css           # settings panel styles
+├── esbuild.config.mjs   # esbuild build configuration
+├── tsconfig.json        # TypeScript configuration
+├── package.json         # dependencies and scripts
+├── versions.json        # version compatibility manifest
+└── .github/workflows/release.yml   # release workflow with artifact attestations
 ```
 
 ## 📄 License
 
-MIT
+[MIT](./LICENSE)
