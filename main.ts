@@ -187,24 +187,29 @@ export default class PunctFlowPlugin extends Plugin {
     // ---------- 粘贴转换：监听粘贴事件 ----------
     this.registerEvent(
       this.app.workspace.on('editor-paste', (evt: ClipboardEvent, editor: Editor) => {
+        // 事件规范：事件已被其他处理器接管时立即返回，避免重复处理
+        if (evt.defaultPrevented) return;
         if (this.settings.mode !== 'paste') return;
-        this.handlePaste(evt, editor);
+        // 处理粘贴逻辑；若已执行转换，则阻止默认粘贴（防止事件冒泡冲突）
+        if (this.handlePaste(evt, editor)) {
+          evt.preventDefault();
+        }
       })
     );
 
     // ---------- 批量转换命令 ----------
     this.addCommand({
-      id: 'punctflow-convert-selection',
+      id: 'convert-selection',
       name: '转换选区',
       editorCallback: (editor) => this.convertSelection(editor),
     });
     this.addCommand({
-      id: 'punctflow-convert-line',
+      id: 'convert-line',
       name: '转换当前行',
       editorCallback: (editor) => this.convertCurrentLine(editor),
     });
     this.addCommand({
-      id: 'punctflow-convert-all',
+      id: 'convert-all',
       name: '转换全文',
       editorCallback: (editor) => this.convertAll(editor),
     });
@@ -220,7 +225,14 @@ export default class PunctFlowPlugin extends Plugin {
   // ==================== 设置读写 ====================
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    // 注意：Obsidian 的 loadData() 官方类型为 Promise<any>。
+    // 先经 unknown + 类型守卫收窄，避免 no-unsafe-assignment。
+    const data: unknown = await this.loadData();
+    this.settings = Object.assign(
+      {},
+      DEFAULT_SETTINGS,
+      data !== null && typeof data === 'object' ? (data as Partial<PunctFlowSettings>) : {}
+    );
   }
 
   async saveSettings() {
@@ -410,30 +422,33 @@ export default class PunctFlowPlugin extends Plugin {
 
   // ==================== 粘贴转换 ====================
 
-  /** 粘贴模式下：对粘贴内容执行映射转换（粘贴位置位于排除上下文时原样粘贴） */
-  private handlePaste(evt: ClipboardEvent, editor: Editor): void {
+  /**
+   * 粘贴模式下：对粘贴内容执行映射转换（粘贴位置位于排除上下文时原样粘贴）。
+   * @returns 是否执行了转换（true 时调用方应 evt.preventDefault() 阻止默认粘贴）
+   */
+  private handlePaste(evt: ClipboardEvent, editor: Editor): boolean {
     // 事件规范：事件已被其他处理器接管（defaultPrevented）时立即返回，避免重复处理
-    if (evt.defaultPrevented) return;
-    if (this.isApplying) return;
+    if (evt.defaultPrevented) return false;
+    if (this.isApplying) return false;
     const text = evt.clipboardData ? evt.clipboardData.getData('text') : '';
-    if (!text) return;
-    if (!this.isFileEligible()) return;
+    if (!text) return false;
+    if (!this.isFileEligible()) return false;
 
     // 粘贴目标位于代码块 / 公式 / frontmatter 等排除上下文 → 原样粘贴
     const cursor = editor.getCursor();
-    if (this.isInExcludedContext(editor, cursor)) return;
+    if (this.isInExcludedContext(editor, cursor)) return false;
 
     const converted = this.convertText(text);
-    if (converted === text) return;
+    if (converted === text) return false;
 
-    // 阻止默认粘贴，改为插入转换后的文本（一次事务 = 一次撤销）
-    evt.preventDefault();
+    // 改为插入转换后的文本（一次事务 = 一次撤销）
     this.isApplying = true;
     try {
       editor.replaceSelection(converted);
     } finally {
       this.isApplying = false;
     }
+    return true;
   }
 
   // ==================== 批量转换命令 ====================
@@ -920,8 +935,8 @@ class PunctFlowSettingTab extends PluginSettingTab {
 
   /**
    * Obsidian ≥ 1.13.0：声明式设置定义。
-   * 返回非空数组时，框架以声明式渲染设置面板并支持「设置」全局搜索，
-   * 不再调用已弃用的 display()。
+   * 返回非空数组时，框架以声明式渲染设置面板并支持「设置」全局搜索
+   * （已弃用的 display() 不再实现）。
    */
   getSettingDefinitions(): SettingDefinitionItem[] {
     const s = this.plugin.settings;
@@ -962,16 +977,20 @@ class PunctFlowSettingTab extends PluginSettingTab {
         })),
         addItem: {
           name: '添加映射',
-          action: async () => {
-            s.mappings.push({ from: '', to: '' });
-            await this.plugin.saveSettings();
-            this.rerender();
+          action: () => {
+            void (async () => {
+              s.mappings.push({ from: '', to: '' });
+              await this.plugin.saveSettings();
+              this.rerender();
+            })();
           },
         },
-        onDelete: async (index: number) => {
-          s.mappings.splice(index, 1);
-          await this.plugin.saveSettings();
-          this.rerender();
+        onDelete: (index: number) => {
+          void (async () => {
+            s.mappings.splice(index, 1);
+            await this.plugin.saveSettings();
+            this.rerender();
+          })();
         },
       },
       // ---------- 2. 自动配对反引号 ----------
@@ -1011,154 +1030,19 @@ class PunctFlowSettingTab extends PluginSettingTab {
       {
         name: '恢复默认映射',
         desc: '将映射表恢复为默认（· → `），其余设置保持不变。',
-        action: async () => {
-          s.mappings = DEFAULT_SETTINGS.mappings.map((m) => ({ ...m }));
-          await this.plugin.saveSettings();
-          this.rerender();
+        action: () => {
+          void (async () => {
+            s.mappings = DEFAULT_SETTINGS.mappings.map((m) => ({ ...m }));
+            await this.plugin.saveSettings();
+            this.rerender();
+          })();
         },
       },
     ];
   }
 
-  /**
-   * 重新渲染设置面板：Obsidian ≥ 1.13.0 走声明式 update()，
-   * 旧版本（< 1.13.0）回退到 display()。
-   */
+  /** 重新渲染设置面板（Obsidian ≥ 1.13.0 声明式框架） */
   private rerender(): void {
-    if (typeof this.update === 'function') {
-      this.update();
-      return;
-    }
-    this.display();
-  }
-
-  /**
-   * Obsidian < 1.13.0 的兼容渲染（display 自 1.13.0 起弃用，
-   * 仅作为旧版本回退路径保留）。
-   */
-  display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
-
-    new Setting(containerEl).setName('PunctFlow 设置').setHeading();
-
-    // ---------- 1. 映射表编辑器 ----------
-    new Setting(containerEl).setName('标点映射表').setHeading();
-    containerEl
-      .createEl('p', {
-        text: '输入字符 → 输出字符串（目标可为空，表示删除）。规则按从上到下顺序匹配。实时模式只对单字符输入生效。',
-      })
-      .addClass('setting-item-description');
-    this.renderMappingRows(containerEl);
-
-    // ---------- 2. 自动配对反引号 ----------
-    new Setting(containerEl)
-      .setName('自动配对反引号')
-      .setDesc('输入 · 转换后自动插入一对反引号并将光标置于中间；再次输入 · 时自动跳过已存在的闭合反引号，避免重复。')
-      .addToggle((t) =>
-        t.setValue(this.plugin.settings.autoPairBacktick).onChange(async (v) => {
-          this.plugin.settings.autoPairBacktick = v;
-          await this.plugin.saveSettings();
-        })
-      );
-
-    // ---------- 3. 工作模式 ----------
-    new Setting(containerEl)
-      .setName('工作模式')
-      .setDesc('实时模式：输入时立即转换；手动模式：仅通过命令转换；粘贴模式：粘贴文本后自动转换粘贴内容。')
-      .addDropdown((d) =>
-        d
-          .addOption('realtime', '实时模式（默认）')
-          .addOption('manual', '手动模式')
-          .addOption('paste', '粘贴转换')
-          .setValue(this.plugin.settings.mode)
-          .onChange(async (v) => {
-            this.plugin.settings.mode = v as PunctFlowMode;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ---------- 4. 排除文件夹 ----------
-    new Setting(containerEl)
-      .setName('排除文件夹')
-      .setDesc('在这些文件夹中的文件不进行转换，每行一个路径（相对仓库根目录），如：日记')
-      .addTextArea((t) =>
-        t
-          .setPlaceholder('日记\n模板')
-          .setValue(this.plugin.settings.excludedFolders)
-          .onChange(async (v) => {
-            this.plugin.settings.excludedFolders = v;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ---------- 5. 排除文件扩展名 ----------
-    new Setting(containerEl)
-      .setName('排除文件扩展名')
-      .setDesc('这些扩展名的文件不转换，每行一个，不带点，如：txt')
-      .addTextArea((t) =>
-        t
-          .setPlaceholder('txt\nlog')
-          .setValue(this.plugin.settings.excludedExtensions)
-          .onChange(async (v) => {
-            this.plugin.settings.excludedExtensions = v;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ---------- 6. 恢复默认映射 ----------
-    new Setting(containerEl)
-      .setName('恢复默认映射')
-      .setDesc('将映射表恢复为默认（· → `），其余设置保持不变。')
-      .addButton((b) =>
-        b.setButtonText('恢复默认').onClick(async () => {
-          this.plugin.settings.mappings = DEFAULT_SETTINGS.mappings.map((m) => ({ ...m }));
-          await this.plugin.saveSettings();
-          this.rerender(); // 重新渲染映射表
-        })
-      );
-  }
-
-  /** 渲染标点映射表（源字符 / 目标 / 删除）与「添加映射」按钮（供旧版本 display() 使用） */
-  private renderMappingRows(containerEl: HTMLElement): void {
-    const list = containerEl.createDiv({ cls: 'punctflow-mapping-list' });
-
-    this.plugin.settings.mappings.forEach((m, idx) => {
-      const row = list.createDiv({ cls: 'punctflow-mapping-row' });
-      new Setting(row)
-        .addText((t) =>
-          t
-            .setPlaceholder('源字符，如 ·')
-            .setValue(m.from)
-            .onChange(async (v) => {
-              m.from = v;
-              await this.plugin.saveSettings();
-            })
-        )
-        .addText((t) =>
-          t
-            .setPlaceholder('目标，如 `')
-            .setValue(m.to)
-            .onChange(async (v) => {
-              m.to = v;
-              await this.plugin.saveSettings();
-            })
-        )
-        .addExtraButton((b) =>
-          b.setIcon('trash').setTooltip('删除该规则').onClick(async () => {
-            this.plugin.settings.mappings.splice(idx, 1);
-            await this.plugin.saveSettings();
-            this.rerender();
-          })
-        );
-    });
-
-    new Setting(containerEl).addButton((b) =>
-      b.setButtonText('+ 添加映射').setCta().onClick(async () => {
-        this.plugin.settings.mappings.push({ from: '', to: '' });
-        await this.plugin.saveSettings();
-        this.rerender();
-      })
-    );
+    this.update();
   }
 }
