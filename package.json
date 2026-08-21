@@ -1,6 +1,6 @@
 {
   "name": "obsidian-punctflow",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "标点流 — 中文 Markdown 智能标点转换（Obsidian 插件）",
   "main": "main.js",
   "scripts": {
